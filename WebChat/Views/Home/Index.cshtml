@@ -1,0 +1,86 @@
+﻿@{
+	ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+	<h1 class="display-4">Welcome</h1>
+	<p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+<div>
+	<canvas id="lineChart"></canvas>
+</div>
+
+@section Scripts
+	{
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script>
+		const ctx = document.getElementById('lineChart');
+		const data = @Html.Raw(Json.Serialize(ViewBag.dataA));
+		const data2 = @Html.Raw(Json.Serialize(ViewBag.dataB));
+		const dataname = '@ViewBag.dataAName';
+		const data2name = '@ViewBag.dataBName';
+
+
+		const labels = [];
+		data.forEach(item => {
+			labels.push(item.date);
+		});
+		const odd1 = [];
+		data.forEach(item => {
+			odd1.push(item.odds);
+		});
+		const odd2 = [];
+		data2.forEach(item => {
+			odd2.push(item.odds);
+		});
+
+		const config = {
+			type: 'line',
+			data: {
+				labels: labels,
+				datasets: [{
+					borderWidth: 1,
+					label: dataname,
+					data: odd1,
+					pointRadius: 0,
+					pointHoverRadius: 10
+				}
+					, {
+					borderWidth: 1,
+					label: data2name,
+					data: odd2,
+					pointRadius: 0,
+					pointHoverRadius: 5
+				}
+				]
+			},
+			options: {
+				scales: {
+					x: {
+						display: false,
+						displayFormats: {
+							min: labels[0],
+							max: labels[labels.length - 1]
+						}
+					}
+				},
+				plugins: {
+					tooltip: {
+						mode: 'index',
+						intersect: false,
+						callbacks: {
+							label: function (context) {
+								const datasetLabel = context.dataset.label;
+								const value = context.parsed.y;
+								return datasetLabel + ': ' + value;
+							}
+						}
+					}
+				}
+			}
+		};
+		new Chart(ctx, config);
+	</script>
+
+
+}
